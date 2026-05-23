@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trading Platform</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial;
+}
+
+body{
+background:#0f172a;
+color:white;
+padding:20px;
+}
+
+.container{
+max-width:500px;
+margin:auto;
+}
+
+.card{
+background:#1e293b;
+padding:20px;
+border-radius:10px;
+margin-bottom:20px;
+}
+
+input, textarea{
+width:100%;
+padding:12px;
+margin-top:10px;
+border:none;
+border-radius:5px;
+outline:none;
+}
+
+button{
+width:100%;
+padding:12px;
+margin-top:15px;
+border:none;
+border-radius:5px;
+background:#22c55e;
+color:white;
+font-size:16px;
+cursor:pointer;
+}
+
+button:hover{
+background:#16a34a;
+}
+
+#chat-box{
+height:200px;
+background:black;
+overflow:auto;
+padding:10px;
+border-radius:10px;
+margin-top:10px;
+}
+
+.message{
+background:#334155;
+padding:10px;
+margin-top:10px;
+border-radius:5px;
+}
+
+#homePage{
+display:none;
+}
+
+#otpBox{
+display:none;
+}
+
+.topbar{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:20px;
+}
+
+.logout-btn{
+background:red;
+width:auto;
+padding:10px 20px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<!-- LOGIN PAGE -->
+
+<div id="loginPage" class="card">
+
+<h1>Sign In</h1>
+
+<input type="text" id="phone" placeholder="Enter phone number">
+
+<button onclick="sendOTP()">Send OTP</button>
+
+<div id="otpBox">
+
+<h3 style="margin-top:20px;">OTP Code</h3>
+
+<input type="text" id="otpInput" placeholder="Enter OTP">
+
+<p style="margin-top:10px;">
+Your OTP:
+<span id="generatedOTP"></span>
+</p>
+
+<button onclick="verifyOTP()">Verify OTP</button>
+
+</div>
+
+</div>
+
+<!-- HOME PAGE -->
+
+<div id="homePage">
+
+<div class="topbar">
+
+<h2>Investment Trading Platform</h2>
+
+<button class="logout-btn" onclick="logoutUser()">
+Logout
+</button>
+
+</div>
+
+<div class="card">
+
+<h2>Account Balance</h2>
+
+<h1>$0.00</h1>
+
+<h3 style="margin-top:20px;">Fund Wallet</h3>
+
+<p>Send payment to:</p>
+
+<notextarea rows="4">
+YOUR TRUST WALLET ADDRESS to fund your wallet
+<0xc7F7FeA10C7766a80d8c5e03A65679297BC77e09>
+</textarea>
+
+</div>
+
+<div class="card">
+
+<h2>Live Trading Chat</h2>
+
+<div id="chat-box"></div>
+
+<input type="text" id="message" placeholder="Type message">
+
+<button onclick="sendMessage()">
+Send Message
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+let currentOTP = "";
+
+// CHECK LOGIN
+
+window.onload = function(){
+
+let loggedIn = localStorage.getItem("loggedIn");
+
+if(loggedIn === "true"){
+
+showHomePage();
+
+}
+
+};
+
+// SEND OTP
+
+function sendOTP(){
+
+let phone = document.getElementById("phone").value;
+
+if(phone === ""){
+
+alert("Enter phone number");
+
+return;
+
+}
+
+currentOTP = Math.floor(1000 + Math.random() * 9000);
+
+document.getElementById("generatedOTP").innerText = currentOTP;
+
+document.getElementById("otpBox").style.display = "block";
+
+}
+
+// VERIFY OTP
+
+function verifyOTP(){
+
+let otpInput = document.getElementById("otpInput").value;
+
+if(otpInput == currentOTP){
+
+localStorage.setItem("loggedIn", "true");
+
+showHomePage();
+
+}else{
+
+alert("Invalid OTP");
+
+}
+
+}
+
+// SHOW HOME PAGE
+
+function showHomePage(){
+
+document.getElementById("loginPage").style.display = "none";
+
+document.getElementById("homePage").style.display = "block";
+
+}
+
+// LOGOUT
+
+function logoutUser(){
+
+localStorage.removeItem("loggedIn");
+
+location.reload();
+
+}
+
+// CHAT SYSTEM
+
+function sendMessage(){
+
+let message = document.getElementById("message").value;
+
+if(message === "") return;
+
+let chatBox = document.getElementById("chat-box");
+
+let div = document.createElement("div");
+
+div.classList.add("message");
+
+div.innerText = message;
+
+chatBox.appendChild(div);
+
+document.getElementById("message").value = "";
+
+chatBox.scrollTop = chatBox.scrollHeight;
+
+}
+
+</script>
+
+</body>
+</html>
