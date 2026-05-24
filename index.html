@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Trading Platform</title>
+<title>Platforma Handlowa</title>
 
 <style>
 
@@ -101,74 +101,75 @@ padding:10px 20px;
 
 <div class="container">
 
-<!-- LOGIN PAGE -->
+<!-- STRONA LOGOWANIA -->
 
 <div id="loginPage" class="card">
 
-<h1>Sign In</h1>
+<h1>Zaloguj się</h1>
 
-<input type="text" id="phone" placeholder="Enter phone number">
+<input type="text" id="phone" placeholder="Wpisz numer telefonu">
 
-<button onclick="sendOTP()">Send OTP</button>
+<button onclick="sendOTP()">Wyślij kod OTP</button>
 
 <div id="otpBox">
 
-<h3 style="margin-top:20px;">OTP Code</h3>
+<h3 style="margin-top:20px;">Kod OTP</h3>
 
-<input type="text" id="otpInput" placeholder="Enter OTP">
+<input type="text" id="otpInput" placeholder="Wpisz kod OTP">
 
 <p style="margin-top:10px;">
-Your OTP:
+Twój kod OTP:
 <span id="generatedOTP"></span>
 </p>
 
-<button onclick="verifyOTP()">Verify OTP</button>
+<button onclick="verifyOTP()">Zweryfikuj OTP</button>
 
 </div>
 
 </div>
 
-<!-- HOME PAGE -->
+<!-- STRONA GŁÓWNA -->
 
 <div id="homePage">
 
 <div class="topbar">
 
-<h2>Investment Trading Platform</h2>
+<h2>Platforma Inwestycyjna</h2>
 
 <button class="logout-btn" onclick="logoutUser()">
-Logout
+Wyloguj
 </button>
 
 </div>
 
 <div class="card">
 
-<h2>Account Balance</h2>
+<h2>Saldo Konta</h2>
 
 <h1>$0.00</h1>
 
-<h3 style="margin-top:20px;">Fund Wallet</h3>
+<h3 style="margin-top:20px;">Doładuj Portfel</h3>
 
-<p>Send payment to:</p>
+<p>Wyślij płatność na:</p>
 
 <notextarea rows="4">
-YOUR TRUST WALLET ADDRESS to fund your wallet
-<0xc7F7FeA10C7766a80d8c5e03A65679297BC77e09>
+TWÓJ ADRES TRUST WALLET
+Aby zasilić adres swojego portfela
+0xc7F7FeA10C7766a80d8c5e03A65679297BC77e09
 </textarea>
 
 </div>
 
 <div class="card">
 
-<h2>Live Trading Chat</h2>
+<h2>Czat Handlowy na Żywo</h2>
 
 <div id="chat-box"></div>
 
-<input type="text" id="message" placeholder="Type message">
+<input type="text" id="message" placeholder="Napisz wiadomość">
 
 <button onclick="sendMessage()">
-Send Message
+Wyślij wiadomość
 </button>
 
 </div>
@@ -181,7 +182,7 @@ Send Message
 
 let currentOTP = "";
 
-// CHECK LOGIN
+// SPRAWDŹ LOGOWANIE
 
 window.onload = function(){
 
@@ -195,7 +196,7 @@ showHomePage();
 
 };
 
-// SEND OTP
+// WYŚLIJ OTP
 
 function sendOTP(){
 
@@ -203,7 +204,7 @@ let phone = document.getElementById("phone").value;
 
 if(phone === ""){
 
-alert("Enter phone number");
+alert("Wpisz numer telefonu");
 
 return;
 
@@ -217,7 +218,7 @@ document.getElementById("otpBox").style.display = "block";
 
 }
 
-// VERIFY OTP
+// WERYFIKUJ OTP
 
 function verifyOTP(){
 
@@ -231,13 +232,13 @@ showHomePage();
 
 }else{
 
-alert("Invalid OTP");
+alert("Nieprawidłowy kod OTP");
 
 }
 
 }
 
-// SHOW HOME PAGE
+// POKAŻ STRONĘ GŁÓWNĄ
 
 function showHomePage(){
 
@@ -247,7 +248,7 @@ document.getElementById("homePage").style.display = "block";
 
 }
 
-// LOGOUT
+// WYLOGUJ
 
 function logoutUser(){
 
@@ -257,7 +258,7 @@ location.reload();
 
 }
 
-// CHAT SYSTEM
+// SYSTEM CZATU
 
 function sendMessage(){
 
