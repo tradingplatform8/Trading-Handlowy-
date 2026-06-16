@@ -1,287 +1,171 @@
 <!DOCTYPE html>
-<html lang="pl">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Platforma Handlowa</title>
-
+<title>Taxi Booking Pro Poland</title>
 <style>
-
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Arial;
-}
-
-body{
-background:#0f172a;
-color:white;
-padding:20px;
-}
-
-.container{
-max-width:500px;
-margin:auto;
-}
-
-.card{
-background:#1e293b;
-padding:20px;
-border-radius:10px;
-margin-bottom:20px;
-}
-
-input, textarea{
-width:100%;
-padding:12px;
-margin-top:10px;
-border:none;
-border-radius:5px;
-outline:none;
-}
-
-button{
-width:100%;
-padding:12px;
-margin-top:15px;
-border:none;
-border-radius:5px;
-background:#22c55e;
-color:white;
-font-size:16px;
-cursor:pointer;
-}
-
-button:hover{
-background:#16a34a;
-}
-
-#chat-box{
-height:200px;
-background:black;
-overflow:auto;
-padding:10px;
-border-radius:10px;
-margin-top:10px;
-}
-
-.message{
-background:#334155;
-padding:10px;
-margin-top:10px;
-border-radius:5px;
-}
-
-#homePage{
-display:none;
-}
-
-#otpBox{
-display:none;
-}
-
-.topbar{
-display:flex;
-justify-content:space-between;
-align-items:center;
-margin-bottom:20px;
-}
-
-.logout-btn{
-background:red;
-width:auto;
-padding:10px 20px;
-}
-
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
+body{background:#f4f4f4}
+.container{width:95%;max-width:900px;margin:20px auto;background:#fff;padding:20px;border-radius:12px;box-shadow:0 0 10px rgba(0,0,0,.1)}
+input,button,textarea{width:100%;padding:12px;margin:8px 0;border:1px solid #ccc;border-radius:6px}
+button{background:#ffc107;border:none;font-weight:bold;cursor:pointer}
+button:hover{background:#ffb300}
+.hidden{display:none}
+.logout{background:red;color:#fff}
+.taxi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:15px;margin-top:15px}
+.taxi-card{border:1px solid #ddd;border-radius:10px;padding:10px;background:#fafafa}
+.taxi-card img{width:100%;height:180px;object-fit:cover;border-radius:8px}
+.booking-card{background:#fafafa;padding:10px;margin-top:10px;border-left:4px solid #ffc107}
+.selected{outline:3px solid #ffc107}
 </style>
 </head>
-
 <body>
 
-<div class="container">
+<div class="container" id="authSection">
+<h1>Taxi Booking Pro Poland</h1>
 
-<!-- STRONA LOGOWANIA -->
+<h2>Sign Up</h2>
+<input id="signupName" placeholder="Full Name">
+<input id="signupEmail" type="email" placeholder="Email">
+<input id="signupPassword" type="password" placeholder="Password">
+<button onclick="signup()">Create Account</button>
 
-<div id="loginPage" class="card">
+<hr><br>
 
-<h1>Zaloguj się</h1>
+<h2>Login</h2>
+<input id="loginEmail" type="email" placeholder="Email">
+<input id="loginPassword" type="password" placeholder="Password">
+<button onclick="login()">Login</button>
+</div>
 
-<input type="text" id="phone" placeholder="Wpisz numer telefonu">
+<div class="container hidden" id="dashboard">
+<h1>Book a Taxi</h1>
+<p id="welcome"></p>
 
-<button onclick="sendOTP()">Wyślij kod OTP</button>
+<input id="pickup" placeholder="Pickup Location">
+<input id="destination" placeholder="Destination">
+<input id="distance" type="number" placeholder="Distance (KM)">
 
-<div id="otpBox">
+<button onclick="estimateFare()">Estimate Fare</button>
+<h3 id="fare"></h3>
 
-<h3 style="margin-top:20px;">Kod OTP</h3>
+<h2>Choose Taxi</h2>
 
-<input type="text" id="otpInput" placeholder="Wpisz kod OTP">
+<div class="taxi-grid">
 
-<p style="margin-top:10px;">
-Twój kod OTP:
-<span id="generatedOTP"></span>
-</p>
+<div class="taxi-card" id="taxi1">
+<!-- Live web link showing an authentic, functional taxi cab interior with a meter and GPS view -->
+<img src="https://images.unsplash.com/photo-1492664738985-f45e342715e1?auto=format&fit=crop&w=800&q=80" alt="City Taxi Interior">
+<h3>City Taxi</h3>
+<p>⭐⭐⭐⭐⭐ 4.9</p>
+<p>Driver: Piotr Kowalski</p>
+<p>Likes: <span id="l1">12</span></p>
+<button onclick="likeTaxi('l1')">👍 Like</button>
+<p>Clean taxi interior view.</p>
+<button onclick="selectTaxi('City Taxi','taxi1')">Select Taxi</button>
+</div>
 
-<button onclick="verifyOTP()">Zweryfikuj OTP</button>
+<div class="taxi-card" id="taxi2">
+<img src="https://images.unsplash.com/photo-1492664738985-f45e342715e1?auto=format&fit=crop&w=800&q=80" alt="Family Taxi Interior">
+<h3>Family Taxi</h3>
+<p>⭐⭐⭐⭐⭐ 4.8</p>
+<p>Driver: Marek Nowak</p>
+<p>Likes: <span id="l2">8</span></p>
+<button onclick="likeTaxi('l2')">👍 Like</button>
+<p>Comfortable passenger seating.</p>
+<button onclick="selectTaxi('Family Taxi','taxi2')">Select Taxi</button>
+</div>
 
+<div class="taxi-card" id="taxi3">
+<img src="https://images.unsplash.com/photo-1492664738985-f45e342715e1?auto=format&fit=crop&w=800&q=80" alt="Standard Taxi Interior">
+<h3>Standard Taxi</h3>
+<p>⭐⭐⭐⭐ 4.3</p>
+<p>Driver: Tomasz Wiśniewski</p>
+<p>Likes: <span id="l3">5</span></p>
+<button onclick="likeTaxi('l3')">👍 Like</button>
+<p>Neat interior for everyday rides.</p>
+<button onclick="selectTaxi('Standard Taxi','taxi3')">Select Taxi</button>
 </div>
 
 </div>
 
-<!-- STRONA GŁÓWNA -->
+<button onclick="bookTaxi()">Book Taxi</button>
+<button class="logout" onclick="logout()">Logout</button>
 
-<div id="homePage">
-
-<div class="topbar">
-
-<h2>Platforma Inwestycyjna</h2>
-
-<button class="logout-btn" onclick="logoutUser()">
-Wyloguj
-</button>
-
-</div>
-
-<div class="card">
-
-<h2>Saldo Konta</h2>
-
-<h1>$0.00</h1>
-
-<h3 style="margin-top:20px;">Doładuj Portfel</h3>
-
-<p>Wyślij płatność na:</p>
-
-<notextarea rows="4">
-TWÓJ ADRES TRUST WALLET
-Aby zasilić adres swojego portfela
-0xc7F7FeA10C7766a80d8c5e03A65679297BC77e09
-</textarea>
-
-</div>
-
-<div class="card">
-
-<h2>Czat Handlowy na Żywo</h2>
-
-<div id="chat-box"></div>
-
-<input type="text" id="message" placeholder="Napisz wiadomość">
-
-<button onclick="sendMessage()">
-Wyślij wiadomość
-</button>
-
-</div>
-
-</div>
-
+<h2>Booking History</h2>
+<div id="history"></div>
 </div>
 
 <script>
+let currentUser=null;
+let selectedTaxi="";
 
-let currentOTP = "";
-
-// SPRAWDŹ LOGOWANIE
-
-window.onload = function(){
-
-let loggedIn = localStorage.getItem("loggedIn");
-
-if(loggedIn === "true"){
-
-showHomePage();
-
+function signup(){
+const name=signupName.value;
+const email=signupEmail.value;
+const password=signupPassword.value;
+if(!name||!email||!password){alert("Fill all fields");return;}
+let users=JSON.parse(localStorage.getItem("users"))||[];
+if(users.find(u=>u.email===email)){alert("Account already exists");return;}
+users.push({name,email,password});
+localStorage.setItem("users",JSON.stringify(users));
+alert("Account created successfully");
 }
 
-};
-
-// WYŚLIJ OTP
-
-function sendOTP(){
-
-let phone = document.getElementById("phone").value;
-
-if(phone === ""){
-
-alert("Wpisz numer telefonu");
-
-return;
-
+function login(){
+let users=JSON.parse(localStorage.getItem("users"))||[];
+let user=users.find(u=>u.email===loginEmail.value&&u.password===loginPassword.value);
+if(!user){alert("Invalid login");return;}
+currentUser=user;
+authSection.classList.add("hidden");
+dashboard.classList.remove("hidden");
+welcome.innerHTML="Welcome <b>"+user.name+"</b>";
+loadHistory();
 }
 
-currentOTP = Math.floor(1000 + Math.random() * 9000);
-
-document.getElementById("generatedOTP").innerText = currentOTP;
-
-document.getElementById("otpBox").style.display = "block";
-
+function estimateFare(){
+let km=parseFloat(distance.value);
+if(!km){alert("Enter distance");return;}
+fare.innerHTML="Estimated Fare: "+((km*4)+10).toFixed(2)+" PLN";
 }
 
-// WERYFIKUJ OTP
-
-function verifyOTP(){
-
-let otpInput = document.getElementById("otpInput").value;
-
-if(otpInput == currentOTP){
-
-localStorage.setItem("loggedIn", "true");
-
-showHomePage();
-
-}else{
-
-alert("Nieprawidłowy kod OTP");
-
+function selectTaxi(name,id){
+selectedTaxi=name;
+document.querySelectorAll(".taxi-card").forEach(x=>x.classList.remove("selected"));
+document.getElementById(id).classList.add("selected");
 }
 
+function likeTaxi(id){
+let el=document.getElementById(id);
+el.textContent=parseInt(el.textContent)+1;
 }
 
-// POKAŻ STRONĘ GŁÓWNĄ
-
-function showHomePage(){
-
-document.getElementById("loginPage").style.display = "none";
-
-document.getElementById("homePage").style.display = "block";
-
+function bookTaxi(){
+if(!selectedTaxi){alert("Select a taxi");return;}
+if(!pickup.value||!destination.value||!distance.value){alert("Fill all fields");return;}
+let booking={taxi:selectedTaxi,pickup:pickup.value,destination:destination.value,distance:distance.value,date:new Date().toLocaleString()};
+let history=JSON.parse(localStorage.getItem(currentUser.email))||[];
+history.push(booking);
+localStorage.setItem(currentUser.email,JSON.stringify(history));
+alert("Taxi booked successfully!");
+loadHistory();
 }
 
-// WYLOGUJ
-
-function logoutUser(){
-
-localStorage.removeItem("loggedIn");
-
-location.reload();
-
+function loadHistory(){
+let history=JSON.parse(localStorage.getItem(currentUser.email))||[];
+let html="";
+history.forEach(item=>{
+html+=`<div class="booking-card"><b>Taxi:</b> ${item.taxi}<br><b>Pickup:</b> ${item.pickup}<br><b>Destination:</b> ${item.destination}<br><b>Distance:</b> ${item.distance} KM<br><b>Date:</b> ${item.date}</div>`;
+});
+document.getElementById("history").innerHTML=html;
 }
 
-// SYSTEM CZATU
-
-function sendMessage(){
-
-let message = document.getElementById("message").value;
-
-if(message === "") return;
-
-let chatBox = document.getElementById("chat-box");
-
-let div = document.createElement("div");
-
-div.classList.add("message");
-
-div.innerText = message;
-
-chatBox.appendChild(div);
-
-document.getElementById("message").value = "";
-
-chatBox.scrollTop = chatBox.scrollHeight;
-
+function logout(){
+currentUser=null;
+dashboard.classList.add("hidden");
+authSection.classList.remove("hidden");
 }
-
 </script>
 
 </body>
