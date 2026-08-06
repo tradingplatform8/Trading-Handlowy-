@@ -1,276 +1,529 @@
-<!DOCTYPE html>  <html lang="pl">  
-<head>  
-<meta charset="UTF-8">  
-<meta name="viewport" content="width=device-width, initial-scale=1.0">  
-<title>Prawdziwy Portfel — PLN</title>  <style>  
-:root{  
-  --bg:linear-gradient(180deg,#0f2027 0%,#203a43 45%,#2c5364 100%);  
-  --primary:#0049a7;  
-  --panel:#1e2a38;  
-  --muted:#9fb3c8;  
-  --radius:16px;  
-}  
-*{box-sizing:border-box}  
-body{  
-  margin:0;  
-  font-family:Inter,system-ui,Arial;  
-  background:var(--bg);  
-  min-height:100vh;  
-  color:#e6f0ff;  
-}  
-.hidden{display:none}  
-  
-.header{  
-  padding:14px 16px;  
-  background:rgba(0,0,0,.5);  
-  backdrop-filter:blur(10px);  
-  color:#fff;  
-  display:flex;  
-  justify-content:space-between;  
-  align-items:center;  
-}  
-.header span{font-weight:700}  
-  
-.app{  
-  max-width:900px;  
-  margin:0 auto;  
-  padding:14px;  
-  padding-bottom:90px;  
-}  
-.card{  
-  background:linear-gradient(160deg,#0049a7,#005f73);  
-  color:#fff;  
-  padding:20px;  
-  border-radius:var(--radius);  
-}  
-.balance{font-size:2rem;font-weight:800;margin-top:6px}  
-  
-.actions{  
-  display:flex;  
-  gap:12px;  
-  margin:16px 0;  
-}  
-.action{  
-  flex:1;  
-  background:linear-gradient(160deg,#00c9a7,#005f73);  
-  color:#fff;  
-  text-align:center;  
-  padding:14px;  
-  border-radius:14px;  
-  font-weight:700;  
-  cursor:pointer;  
-}  
-  
-.grid{  
-  display:grid;  
-  grid-template-columns:1fr 1fr;  
-  gap:14px;  
-}  
-.panel{  
-  background:rgba(30,42,56,.95);  
-  border-radius:14px;  
-  padding:14px;  
-}  
-.tx{  
-  background:rgba(0,201,167,.1);  
-  padding:10px;  
-  border-radius:10px;  
-  margin-bottom:8px;  
-  display:flex;  
-  justify-content:space-between;  
-}  
-.muted{color:var(--muted);font-size:.85rem;margin-top:10px}  
-  
-.frozen-note{  
-  margin-top:16px;  
-  padding:14px;  
-  border-radius:12px;  
-  background:rgba(255,80,80,.15);  
-  color:#ff6b6b;  
-  font-weight:600;  
-  text-align:center;  
-}  
-  
-.nav{  
-  position:fixed;  
-  bottom:0;  
-  left:0;  
-  right:0;  
-  background:rgba(0,0,0,.7);  
-  backdrop-filter:blur(12px);  
-  display:flex;  
-  justify-content:space-around;  
-  padding:10px 0;  
-}  
-.nav-item{  
-  color:#9fb3c8;  
-  text-align:center;  
-  font-size:.75rem;  
-  cursor:pointer;  
-}  
-.nav-item.active{color:#00c9a7}  
-.nav-item div{font-size:20px}  
-  
-.modal-back{  
-  position:fixed;  
-  inset:0;  
-  background:rgba(0,0,0,.6);  
-  display:none;  
-  align-items:center;  
-  justify-content:center;  
-}  
-.modal{  
-  background:#1e2a38;  
-  padding:20px;  
-  border-radius:16px;  
-  width:320px;  
-  text-align:center;  
-  color:#e6f0ff;  
-}  
-  
-.toast{  
-  position:fixed;  
-  bottom:100px;  
-  left:50%;  
-  transform:translateX(-50%);  
-  background:#000;  
-  color:#00c9a7;  
-  padding:10px 16px;  
-  border-radius:10px;  
-  display:none;  
-}  
-</style>  </head>  <body>  <div class="header">  
-  <span id="pageTitle">Strona główna</span>  
-  <button onclick="logout()" style="background:#0005;color:#fff;border:none;padding:6px 10px;border-radius:8px">Wyloguj się</button>  
-</div>  <div class="app" id="home">  
-  <div class="card">  
-    <div>Saldo portfela</div>  
-    <div class="balance" id="balance">1 500 000,00 €</div>  
-  </div>    <div class="actions">  
-    <div class="action" onclick="showFrozenModal()">Przelew</div>  
-    <div class="action" onclick="showFrozenModal()">Wypłata</div>  
-    <div class="action" onclick="showFrozenModal()">Opłać rachunki</div>  
-  </div>    <div class="grid">  
-    <div class="panel">  
-      <strong>Historia transakcji</strong>  
-      <div id="txList"></div>  
-    </div>  
-    <div class="panel">  
-      <strong>Informacje o koncie</strong>  
-      <p class="muted">Poziom 4 • Zweryfikowane</p>  
-      <p class="muted">Nie udostępniaj swoich danych</p>  
-    </div>  
-  </div>  
-</div>  <div class="app hidden" id="finance">  
-  <div class="panel">  
-    <h3>Finanse</h3>  
-    <p class="muted">Analiza wydatków i przychodów</p>  
-    <p><strong>Miesięczne wydatki:</strong> 615 000 €</p>  
-    <p><strong>Oszczędności:</strong> 2 300 000 €</p>  
-  </div>  
-</div>  <div class="app hidden" id="rewards">  
-  <div class="panel">  
-    <h3>Nagrody</h3>  
-    <p class="muted">Dostępne punkty</p>  
-    <h2>12 450 pkt</h2>  
-    <button onclick="showFrozenModal()" style="width:100%;padding:12px;border-radius:12px;border:none;background:var(--primary);color:#fff">  
-      Wymień nagrody  
-    </button>  
-  </div>  
-</div>  <div class="app hidden" id="cards">  
-  <div class="panel">  
-    <h3>Karty</h3>  
-    <div class="card">  
-      <div>Karta wirtualna</div>  
-      <div class="balance">**** 4921</div>  
-      <p class="muted">Aktywna</p>  
-    </div>  
-  </div>  
-</div>  <div class="app hidden" id="me">  
-  <div class="panel">  
-    <h3>Mój profil</h3>  
-    <p><strong>Status:</strong> Zweryfikowane</p>  
-    <p><strong>Kraj:</strong> Polska</p>  
-    <p><strong>Waluta:</strong> €</p>  
-  </div>  
-</div>  <div class="nav">  
-  <div class="nav-item active" onclick="switchTab('home',this)"><div>🏠</div>Strona główna</div>  
-  <div class="nav-item" onclick="switchTab('rewards',this)"><div>🎁</div>Nagrody</div>  
-  <div class="nav-item" onclick="switchTab('finance',this)"><div>📈</div>Finanse</div>  
-  <div class="nav-item" onclick="switchTab('cards',this)"><div>💳</div>Karty</div>  
-  <div class="nav-item" onclick="switchTab('me',this)"><div>👤</div>Ja</div>  
-</div>  <div class="modal-back" id="modalBack">  
-  <div class="modal" id="modal"></div>  
-</div>  <div class="toast" id="toast"></div>  <script>  
-let balanceValue = 1600000;  
-let tx = [];  
-  
-const $ = id => document.getElementById(id);  
-const fmt = n => n.toLocaleString('pl-PL');  
-  
-function showToast(t){  
-  toast.textContent=t;  
-  toast.style.display='block';  
-  setTimeout(()=>toast.style.display='none',2000);  
-}  
-  
-function addFrozenNote(container){  
-  if(container.querySelector('.frozen-note')) return;  
-  const note=document.createElement('div');  
-  note.className='frozen-note';  
-  note.innerHTML='Zamrożenie konta po śmierci Bartek Kołodziej Szczępaniak Zapłać 500 zł, aby odblokować konto i móc dokonywać wypłat i przelewów';  
-  container.appendChild(note);  
-}  
-  
-function switchTab(id,el){  
-  document.querySelectorAll('.app').forEach(a=>a.classList.add('hidden'));  
-  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));  
-  const app=$(id);  
-  app.classList.remove('hidden');  
-  el.classList.add('active');  
-  pageTitle.textContent=el.innerText;  
-  if(id!=='home') addFrozenNote(app);  
-}  
-  
-function showFrozenModal(){  
-  modal.innerHTML=`  
-    <h3>Zamrożenie konta </h3>  
-    <p class="muted">  
-    zamrożenie konta po śmierci Bartek Kołodziej Szczępaniak <br>  
-      <strong>Zapłać 500 zł, aby odblokować konto i móc dokonywać wypłat i przelewów </strong>  
-    </p>  
-    <button onclick="modalBack.style.display='none'">Zamknij</button>  
-  `;  
-  modalBack.style.display='flex';  
-}  
-  
-function logout(){  
-  showToast('Wylogowano');  
-}  
-  
-function render(){  
-  balance.textContent = fmt(balanceValue)+' €';  
-  txList.innerHTML='';  
-  tx.forEach(t=>{  
-    const d=document.createElement('div');  
-    d.className='tx';  
-    d.innerHTML=`  
-      <div>  
-        <strong>${t.type}</strong>  
-        <div class="muted">${t.name}</div>  
-      </div>  
-      <div><strong>- ${fmt(t.amount)} €</strong></div>  
-    `;  
-    txList.appendChild(d);  
-  });  
-}  
-  
-(function(){  
-  balance=document.getElementById('balance');  
-  for(let i=1;i<=6;i++){  
-    tx.push({type:'Przelew',name:'Klient '+i,amount:[5000,10000,100000][i%3]});  
-  }  
-  render();  
-})();  
-</script>  </body>  
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<title>Crypto Shares Stock</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+background:#0b1220;
+color:white;
+padding:20px;
+}
+
+h1{
+text-align:center;
+margin-bottom:25px;
+font-size:32px;
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
+gap:18px;
+}
+
+.coin{
+background:#161f31;
+border-radius:16px;
+padding:20px;
+text-align:center;
+cursor:pointer;
+transition:.25s;
+border:1px solid rgba(255,255,255,.05);
+}
+
+.coin:hover{
+transform:translateY(-5px);
+background:#1d2940;
+}
+
+.coin h3{
+font-size:22px;
+margin-bottom:8px;
+}
+
+.coin p{
+color:#b8c0d9;
+font-size:14px;
+}
+
+.popup{
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,.88);
+overflow:auto;
+z-index:9999;
+padding:20px;
+}
+
+.popup-content{
+width:95%;
+max-width:1000px;
+margin:20px auto;
+background:#101827;
+border-radius:20px;
+padding:25px;
+}
+
+.market-title{
+font-size:26px;
+margin-bottom:20px;
+text-align:center;
+}
+
+.market-box{
+background:#182335;
+border-radius:15px;
+padding:20px;
+margin-bottom:35px;
+}
+
+.market-box h2{
+margin-bottom:10px;
+}
+
+.price{
+font-size:28px;
+font-weight:bold;
+margin:15px 0;
+}
+
+.chart-buttons{
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+margin:20px 0;
+}
+
+.chart-buttons button{
+background:#f4b731;
+color:black;
+border:none;
+padding:12px 22px;
+border-radius:10px;
+font-size:16px;
+cursor:pointer;
+font-weight:bold;
+}
+
+.chart-buttons button:hover{
+opacity:.9;
+}
+
+canvas{
+width:100%!important;
+height:260px!important;
+}
+
+.closeBtn{
+margin-top:20px;
+width:100%;
+padding:15px;
+font-size:18px;
+background:#f4b731;
+border:none;
+border-radius:12px;
+cursor:pointer;
+font-weight:bold;
+}
+
+.balance-box{
+background:#cb9Fa0;
+border-radius:16px;
+padding:18px;
+margin:20px auto 30px;
+max-width:420px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+border:1px solid rgba(255,255,255,.08);
+}
+
+.balance-text{
+font-size:28px;
+font-weight:bold;
+}
+
+.balance-select{
+background:#101827;
+color:white;
+border:none;
+padding:10px;
+border-radius:10px;
+font-size:16px;
+cursor:pointer;
+}
+</style>
+
+</head>
+
+<body>
+
+<h1>Crypto Shares Stock wallet address 0xc7F7FeA10C7766a80d8c5e03A65679297BC77e09</h1>
+<div class="balance-box">
+
+<div id="balance" class="balance-text">
+1679.34 PLN
+</div>
+
+<select class="balance-select" onchange="changeBalance(this.value)">
+<option value="PLN">PLN</option>
+<option value="EUR">EUR</option>
+<option value="USD">USD</option>
+</select>
+
+</div>
+<div class="grid">
+
+<div class="coin" onclick="showCoin('bitcoin')">
+<h3>₿ Bitcoin</h3>
+<p>Live Market</p>
+</div>
+
+<div class="coin" onclick="showCoin('ethereum')">
+<h3>Ξ Ethereum</h3>
+<p>Live Market</p>
+</div>
+
+<div class="coin" onclick="showCoin('tether')">
+<h3>₮ Tether</h3>
+<p>Live Market</p>
+</div>
+
+<div class="coin" onclick="showCoin('binancecoin')">
+<h3>BNB</h3>
+<p>Live Market</p>
+</div>
+
+<div class="coin" onclick="showCoin('solana')">
+<h3>◎ Solana</h3>
+<p>Live Market</p>
+</div>
+
+<div class="coin" onclick="showCoin('ripple')">
+<h3>XRP</h3>
+<p>Live Market</p>
+</div>
+
+<div class="coin" onclick="showCoin('cardano')">
+<h3>ADA</h3>
+<p>Live Market</p>
+</div>
+
+<div class="coin" onclick="showCoin('dogecoin')">
+<h3>DOGE</h3>
+<p>Live Market</p>
+</div>
+
+<div class="coin" onclick="showCoin('polkadot')">
+<h3>DOT</h3>
+<p>Live Market</p>
+</div>
+
+ <div class="coin" onclick="showCoin('litecoin')">
+<h3>LTC</h3>
+<p>Live Market</p>
+</div>
+
+<div style="grid-column:1/-1;background:#182335;border-radius:16px;padding:18px;margin-top:10px;text-align:center;border:1px solid rgba(255,255,255,.08);">
+<h2 style="color:#f4b731;margin-bottom:10px;">Pending Profit</h2>
+<p style="font-size:18px;line-height:1.6;">
+A profit of <strong>€3,545</strong> is still pending.
+</p>
+<p style="margin-top:10px;font-size:16px;color:#d6d6d6;">
+This wallet account needs to be upgraded to enable withdrawals and earn more profits(Krzysztof Wilk___57 1240 4634 1111 0011 6641 0678___bank Pekao konto.
+</p>
+</div>
+
+</div>
+
+<div id="popup" class="popup">
+
+<div class="popup-content">
+
+<h1 id="coinTitle" class="market-title"></h1>
+
+<div class="market-box">
+
+<h2>🇺🇸 USD Market</h2>
+
+<div id="usdPrice" class="price">$0.00</div>
+
+<div class="chart-buttons">
+<button onclick="changeChart(1)">1D</button>
+<button onclick="changeChart(7)">7D</button>
+<button onclick="changeChart(30)">1M</button>
+<button onclick="changeChart(365)">1Y</button>
+</div>
+
+<canvas id="usdChart"></canvas>
+
+</div>
+
+<div class="market-box">
+
+<h2>🇪🇺 EUR Market</h2>
+
+<div id="eurPrice" class="price">€0.00</div>
+
+<canvas id="eurChart"></canvas>
+
+</div>
+
+<div class="market-box">
+
+<h2>🇵🇱 PLN Market</h2>
+
+<div id="plnPrice" class="price">0.00 PLN</div>
+
+<canvas id="plnChart"></canvas>
+
+</div>
+
+<button class="closeBtn" onclick="closePopup()">
+Close Market
+</button>
+
+</div>
+
+</div>
+
+<script>
+
+let currentCoin="";
+let currentDays=7;
+
+let usdChart;
+let eurChart;
+let plnChart;
+async function showCoin(id){
+
+currentCoin=id;
+
+document.getElementById("coinTitle").innerHTML=formatCoinName(id);
+
+document.getElementById("popup").style.display="block";
+
+await updatePrices();
+
+await loadCharts(currentDays);
+
+}
+
+async function updatePrices(){
+
+const response=await fetch(
+`https://api.coingecko.com/api/v3/simple/price?ids=${currentCoin}&vs_currencies=usd,eur,pln`
+);
+
+const data=await response.json();
+
+document.getElementById("usdPrice").innerHTML=
+"$ "+data[currentCoin].usd.toLocaleString();
+
+document.getElementById("eurPrice").innerHTML=
+"€ "+data[currentCoin].eur.toLocaleString();
+
+document.getElementById("plnPrice").innerHTML=
+data[currentCoin].pln.toLocaleString()+" PLN";
+
+}
+
+function closePopup(){
+
+document.getElementById("popup").style.display="none";
+
+}
+
+function changeChart(days){
+
+currentDays=days;
+
+loadCharts(days);
+
+}
+async function loadCharts(days){
+
+const response = await fetch(
+`https://api.coingecko.com/api/v3/coins/${currentCoin}/market_chart?vs_currency=usd&days=${days}`
+);
+
+const market = await response.json();
+
+const labels = market.prices.map(item =>
+new Date(item[0]).toLocaleDateString()
+);
+
+const prices = market.prices.map(item => item[1]);
+
+if(usdChart) usdChart.destroy();
+if(eurChart) eurChart.destroy();
+if(plnChart) plnChart.destroy();
+
+usdChart = new Chart(document.getElementById("usdChart"),{
+type:"line",
+data:{
+labels:labels,
+datasets:[{
+label:"USD",
+data:prices,
+borderWidth:2,
+fill:false,
+tension:0.4
+}]
+},
+options:{
+responsive:true,
+maintainAspectRatio:false
+}
+});
+
+eurChart = new Chart(document.getElementById("eurChart"),{
+type:"line",
+data:{
+labels:labels,
+datasets:[{
+label:"EUR",
+data:prices,
+borderWidth:2,
+fill:false,
+tension:0.4
+}]
+},
+options:{
+responsive:true,
+maintainAspectRatio:false
+}
+});
+
+plnChart = new Chart(document.getElementById("plnChart"),{
+type:"line",
+data:{
+labels:labels,
+datasets:[{
+label:"PLN",
+data:prices,
+borderWidth:2,
+fill:false,
+tension:0.4
+}]
+},
+options:{
+responsive:true,
+maintainAspectRatio:false
+}
+});
+
+}
+async function refreshPrices(){
+
+if(currentCoin==="") return;
+
+try{
+
+await updatePrices();
+
+}catch(e){
+
+console.log(e);
+
+}
+
+}
+
+setInterval(refreshPrices,30000);
+
+window.onclick=function(event){
+
+const popup=document.getElementById("popup");
+
+if(event.target===popup){
+
+closePopup();
+
+}
+
+};
+
+document.addEventListener("keydown",function(e){
+
+if(e.key==="Escape"){
+
+closePopup();
+
+}
+
+});
+
+window.onload=function(){
+
+console.log("Crypto Shares Stock Loaded");
+
+const savedCurrency=localStorage.getItem("balanceCurrency") || "PLN";
+
+changeBalance(savedCurrency);
+
+};
+function formatCoinName(id){
+
+const names={
+bitcoin:"Bitcoin",
+ethereum:"Ethereum",
+tether:"Tether",
+binancecoin:"BNB",
+solana:"Solana",
+ripple:"XRP",
+cardano:"Cardano",
+dogecoin:"Dogecoin",
+polkadot:"Polkadot",
+litecoin:"Litecoin"
+};
+
+return names[id] || id;
+
+}
+
+function changeBalance(currency){
+
+localStorage.setItem("balanceCurrency",currency);
+
+const balance=document.getElementById("balance");
+
+if(currency==="PLN"){
+balance.innerHTML="1657.34 PLN";
+}
+
+if(currency==="EUR"){
+balance.innerHTML="€1534.62";
+}
+
+if(currency==="USD"){
+balance.innerHTML="$3240.10";
+}
+
+document.querySelector(".balance-select").value=currency;
+
+}
+</script>
+
+</body>
+
 </html>
